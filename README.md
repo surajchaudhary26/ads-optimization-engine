@@ -39,3 +39,30 @@ The system decides which ads should be selected at a given moment based on the p
 - If required inputs are missing → return a clear error message
 - If inputs are invalid → return a safe error
 - If no ad fits the budget → return an empty selection (not an error)
+
+## 3. Core Decision Logic (Phase 3)
+
+This phase implements the core inference pipeline of the system using clean, modular Python code.
+
+### Components Implemented
+
+- **Input Validation**
+  - Validates presence and correctness of ads and budget
+  - Prevents invalid or unsafe inputs from reaching decision logic
+
+- **Rule-Based Optimization (Baseline)**
+  - Selects ads within the given budget using a deterministic greedy approach
+  - Serves as a baseline before introducing ML-based optimization
+
+- **Decision Service (Orchestration Layer)**
+  - Combines validation and optimization into a single decision flow
+  - Returns safe, structured responses for both valid and error cases
+
+### Outcome
+
+At the end of this phase, the system can:
+- Safely accept inputs
+- Handle edge cases gracefully
+- Produce correct ad-selection decisions without ML or APIs
+
+This establishes a stable foundation for API integration and ML-based optimization in later phases.
