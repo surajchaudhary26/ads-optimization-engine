@@ -66,3 +66,26 @@ At the end of this phase, the system can:
 - Produce correct ad-selection decisions without ML or APIs
 
 This establishes a stable foundation for API integration and ML-based optimization in later phases.
+
+## 4. API Layer (Phase 4)
+
+In this phase, the core decision engine was exposed via a thin FastAPI layer to make the system usable by external services.
+
+### API Endpoint
+
+- **POST `/decide-ads`**
+  - Accepts a list of ads and a total budget
+  - Returns selected ads and total cost used
+
+### Design Principles
+
+- The API layer contains no business or optimization logic
+- All decision-making is delegated to the service layer
+- Clean HTTP status codes are used:
+  - `200 OK` for valid decisions
+  - `400 Bad Request` for invalid inputs
+
+### Outcome
+
+The system can now be integrated with any backend through a simple HTTP interface while keeping the inference pipeline fully isolated and maintainable.
+
