@@ -89,3 +89,15 @@ In this phase, the core decision engine was exposed via a thin FastAPI layer to 
 
 The system can now be integrated with any backend through a simple HTTP interface while keeping the inference pipeline fully isolated and maintainable.
 
+## 5. LOGIC+ Improvements (Phase 5)
+
+Before introducing ML, the rule-based optimizer was enhanced to improve decision quality.
+
+### Enhancements
+- Ads are sorted by business priority (high to low)
+- Within the same priority, ads are sorted by cost (low to high)
+- Maintains deterministic, explainable behavior
+
+### Outcome
+The system produces higher-quality, business-aligned decisions
+while remaining simple, fast, and fully explainable.
