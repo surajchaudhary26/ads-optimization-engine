@@ -200,3 +200,33 @@ Start the server:
 
 ```bash
 uvicorn app.main:app --reload
+
+### API Request Schema (Pydantic)
+
+The API uses **Pydantic schemas** to define a clear and explicit request contract.
+
+These schemas serve two purposes:
+- Enforce input structure and data types at the API boundary
+- Automatically generate meaningful request examples in Swagger (`/docs`)
+
+#### Design Principle
+The API accepts only **raw business inputs**.  
+Derived or engineered features are computed internally by the system.
+
+**Business inputs include:**
+- cost
+- priority
+- clicks
+- conversions
+
+**Excluded from API input:**
+- conversion_rate
+- value_score
+- any ML-engineered features
+
+This ensures:
+- Loose coupling between business clients and ML logic
+- Flexibility to evolve feature engineering without breaking API contracts
+
+The request schema is defined using Pydantic and is used exclusively at the API layer.
+
