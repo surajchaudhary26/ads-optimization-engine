@@ -191,15 +191,7 @@ This hybrid approach ensures decisions remain safe, explainable, and aligned wit
 
 Even if ML predictions are imperfect, the final decision remains stable and interpretable because business rules retain control.
 
-
 ---
-
-### Running the Inference API
-
-Start the server:
-
-```bash
-uvicorn app.main:app --reload
 
 ### API Request Schema (Pydantic)
 
@@ -229,4 +221,3 @@ This ensures:
 - Flexibility to evolve feature engineering without breaking API contracts
 
 The request schema is defined using Pydantic and is used exclusively at the API layer.
-
