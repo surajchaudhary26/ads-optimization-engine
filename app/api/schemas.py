@@ -4,10 +4,10 @@ from typing import List
 
 class AdInput(BaseModel):
     ad_id: str = Field(..., example="ad_201")
-    cost: float = Field(..., example=100)
-    priority: int = Field(..., example=4)
-    clicks: int = Field(..., example=120)
-    conversions: int = Field(..., example=12)
+    cost: float = Field(..., gt=0,example=100)
+    priority: int = Field(..., example=3)
+    clicks: int = Field(..., ge=0, example=120)
+    conversions: int = Field(..., gt=0, example=12)
 
 
 class AdsRequest(BaseModel):

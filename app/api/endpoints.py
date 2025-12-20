@@ -11,7 +11,7 @@ def decide_ads_endpoint(request: AdsRequest):
     API endpoint to decide which ads to select under a given budget.
     """
 
-    # ✅ Correct way to access Pydantic fields
+    # Correct way to access Pydantic fields
     ads = request.ads
     total_budget = request.total_budget
 

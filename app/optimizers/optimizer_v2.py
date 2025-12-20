@@ -1,22 +1,6 @@
-import joblib
 import numpy as np
-from pathlib import Path
-
 from app.features.feature_extractor import extract_features
-
-
-# -------------------------------
-# Load ML model ONCE (at startup)
-# -------------------------------
-MODEL_PATH = Path("artifacts/value_model.pkl")
-
-if not MODEL_PATH.exists():
-    raise FileNotFoundError(
-        "ML model not found. Please run training pipeline first."
-    )
-
-model = joblib.load(MODEL_PATH)
-
+from app.inference.model_loader import model
 
 def hybrid_score(ad, ml_score):
     """
