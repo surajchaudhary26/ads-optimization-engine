@@ -101,3 +101,102 @@ Before introducing ML, the rule-based optimizer was enhanced to improve decision
 ### Outcome
 The system produces higher-quality, business-aligned decisions
 while remaining simple, fast, and fully explainable.
+
+## 6. Machine Learning Training Pipeline (Phase 6)
+
+After improving the rule-based optimizer, a machine learning training pipeline was introduced to learn patterns from historical ad performance data.
+
+### Objective
+To build a **reproducible and modular ML training pipeline** that can generate a predictive model without affecting the live inference system.
+
+### Key Design Principles
+- Training and inference are strictly separated
+- Feature engineering logic is shared across training and inference
+- ML artifacts are treated as runtime outputs, not source code
+
+### Training Pipeline Structure
+training/
+├── steps/
+│ ├── train_model.py
+│ ├── evaluate_model.py
+│ └── save_model.py
+├── pipeline/
+│ └── run_training_pipeline.py
+
+
+### Workflow
+1. Historical ad performance data is generated
+2. Features are engineered consistently
+3. The model is trained and evaluated
+4. A trained model in artifact is produced locally
+
+### Notes
+- The trained model file (`value_model.pkl`) is intentionally excluded from version control
+- The training pipeline can be re-run at any time to regenerate the model
+
+This phase establishes a **production-aligned ML foundation**.
+
+---
+
+## 7. Hybrid ML Inference System (Phase 7)
+
+In this phase, the trained ML model is integrated into the FastAPI inference system using a **hybrid optimization approach**.
+
+### Core Idea
+Machine learning is introduced as an **assistive signal**, while business rules retain final control over decisions.
+
+---
+
+### Optimizer Versions
+
+#### Optimizer v1 – Rule-Based
+- Uses deterministic business rules
+- Fully explainable and predictable
+- Acts as a safe fallback mechanism
+
+#### Optimizer v2 – Hybrid ML
+- Uses the ML model to predict a value score for each ad
+- Combines ML score with business signals such as:
+  - ad priority
+  - cost penalty
+- Produces a final hybrid score used for ranking ads
+
+---
+
+### Decision Service (Central Control Layer)
+
+A dedicated decision service is responsible for:
+- Validating incoming requests
+- Selecting the optimizer version (v1 or v2)
+- Keeping the API layer independent of optimization logic
+
+This design enables:
+- Safe ML rollout
+- Easy rollback to rule-based logic
+- Future A/B testing support
+
+---
+
+### Hybrid Scoring Logic (Conceptual)
+
+The final ranking score is calculated by combining the ML prediction with business rules, ensuring that machine learning assists decision-making without fully controlling it.
+
+final_score = (ML score × weight) + (priority influence) − (cost penalty)
+
+- The ML score provides a predictive signal based on historical performance
+- Priority ensures business-critical ads are favored
+- Cost penalty prevents expensive ads from dominating the selection
+
+This hybrid approach ensures decisions remain safe, explainable, and aligned with business objectives.
+
+Even if ML predictions are imperfect, the final decision remains stable and interpretable because business rules retain control.
+
+
+---
+
+### Running the Inference API
+
+Start the server:
+
+```bash
+uvicorn app.main:app --reload
