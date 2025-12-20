@@ -13,20 +13,23 @@ def extract_features(ad: dict) -> dict:
         dict: engineered numerical features
     """
 
-    clicks = ad.get("clicks", 0)
-    conversions = ad.get("conversions", 0)
+    clicks = ad.clicks
+    conversions = ad.conversions
+    cost = ad.cost
+    priority = ad.priority
 
     # Safe conversion rate calculation
     conversion_rate = (
         conversions / clicks if clicks > 0 else 0.0
     )
 
-    features = {
-        "cost": float(ad.get("cost", 0)),
-        "priority": int(ad.get("priority", 0)),
-        "clicks": int(clicks),
-        "conversions": int(conversions),
-        "conversion_rate": float(conversion_rate),
-    }
+    # Avoid division by zero
+    conversion_rate = conversions / clicks if clicks > 0 else 0.0
 
-    return features
+    return {
+        "cost": cost,
+        "priority": priority,
+        "clicks": clicks,
+        "conversions": conversions,
+        "conversion_rate": conversion_rate
+    }

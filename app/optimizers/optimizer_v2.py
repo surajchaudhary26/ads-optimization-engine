@@ -26,8 +26,8 @@ def hybrid_score(ad, ml_score):
 
     ml_score_norm = ml_score / 100  
 
-    priority_weight = ad["priority"] * 0.5
-    cost_penalty = ad["cost"] * 0.1
+    priority_weight = ad.priority * 0.5
+    cost_penalty = ad.cost * 0.1
 
     final_score = (
         0.3 * ml_score_norm
@@ -62,8 +62,8 @@ def optimize_ads_v2(ads):
         final_score = hybrid_score(ad, ml_score)
 
         optimized_ads.append({
-            "ad_id": ad["ad_id"],
-            "cost": ad["cost"],
+            "ad_id": ad.ad_id,
+            "cost": ad.cost,
             "ml_score": round(float(ml_score), 2),
             "final_score": round(float(final_score), 2)
         })

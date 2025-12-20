@@ -12,10 +12,10 @@ def validate_input(ads, total_budget):
 
     # 3. Check each ad cost
     for ad in ads:
-        if "cost" not in ad:
+        if not hasattr(ad, "cost"):
             return False, "Each ad must have a cost"
 
-        if ad["cost"] <= 0:
+        if ad.cost <= 0:
             return False, "Ad cost must be greater than zero"
 
     # If everything is fine
