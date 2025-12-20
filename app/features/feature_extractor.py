@@ -19,11 +19,7 @@ def extract_features(ad: dict) -> dict:
     priority = ad.priority
 
     # Safe conversion rate calculation
-    conversion_rate = (
-        conversions / clicks if clicks > 0 else 0.0
-    )
-
-    # Avoid division by zero
+    
     conversion_rate = conversions / clicks if clicks > 0 else 0.0
 
     return {
