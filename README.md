@@ -248,6 +248,5 @@ docker run -p 8000:8000 ersurajkr/ads-optimization-engine:latest
 The application is deployed on **Render** and publicly accessible.
 
  **Live Swagger UI:**  
-https://ads-optimization-engine.onrender.com/docs
-
+https://ads-optimization-engine-latest.onrender.com
 This deployment uses the same Docker image as the local setup, demonstrating a production-ready ML inference API.
