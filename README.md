@@ -221,3 +221,23 @@ This ensures:
 - Flexibility to evolve feature engineering without breaking API contracts
 
 The request schema is defined using Pydantic and is used exclusively at the API layer.
+
+---
+
+## Dockerized Deployment
+
+The ML inference service is fully containerized using Docker to ensure
+consistent behavior across environments.
+
+### Docker Image (Docker Hub)
+
+The production-ready image is publicly available on Docker Hub:
+
+
+### Run Using Docker (Recommended)
+
+Pull and run the container:
+
+```bash
+docker pull ersurajkr/ads-optimization-engine:latest
+docker run -p 8000:8000 ersurajkr/ads-optimization-engine:latest
