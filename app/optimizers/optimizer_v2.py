@@ -43,19 +43,15 @@ def optimize_ads_v2(
     ranked_ads = []
 
     for ad in ads:
-        # Extract engineered features
         features = extract_features(ad)
 
-        # Create DataFrame with FEATURE NAMES (FIXES WARNING)
+        # DataFrame with feature names (avoids sklearn warnings)
         X = pd.DataFrame(
             [[features[col] for col in FEATURE_COLUMNS]],
             columns=FEATURE_COLUMNS
         )
 
-        # ML prediction
         ml_score = float(model.predict(X)[0])
-
-        # Hybrid scoring
         final_score = hybrid_score(ad, ml_score)
 
         ranked_ads.append({
@@ -81,6 +77,5 @@ def optimize_ads_v2(
     return {
         "strategy": "hybrid_ml",
         "selected_ads": selected_ads,
-        "total_cost": round(total_budget - remaining_budget, 2),
-        "remaining_budget": round(remaining_budget, 2)
+        "total_cost": round(total_budget - remaining_budget, 2)
     }

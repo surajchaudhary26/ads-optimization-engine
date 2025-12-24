@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from app.api.schemas import AdInput
 
+
 def validate_input(
     ads: List[AdInput],
     total_budget: float
@@ -14,10 +15,12 @@ def validate_input(
     if not ads:
         return False, "Ads list cannot be empty"
 
-    # 3. Duplicate ad_id validation
-    ad_ids = [ad.ad_id for ad in ads]
-    if len(ad_ids) != len(set(ad_ids)):
-        return False, "Duplicate ad_id found. Each ad must have a unique ad_id"
+    # 3. Duplicate ad_id validation (explicit)
+    seen_ids = set()
+    for ad in ads:
+        if ad.ad_id in seen_ids:
+            return False, f"Duplicate ad_id detected: '{ad.ad_id}'"
+        seen_ids.add(ad.ad_id)
 
     # 4. Per-ad validation
     for idx, ad in enumerate(ads):

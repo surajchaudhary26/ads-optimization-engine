@@ -10,6 +10,7 @@ def select_ads_rule_based(
     selected_ads = []
     remaining_budget = total_budget
 
+    # Sort by priority (desc), then cost (asc)
     ads_sorted = sorted(
         ads,
         key=lambda ad: (-ad.priority, ad.cost)
@@ -27,6 +28,5 @@ def select_ads_rule_based(
     return {
         "strategy": "rule_based",
         "selected_ads": selected_ads,
-        "total_cost": total_budget - remaining_budget,
-        "remaining_budget": remaining_budget
+        "total_cost": round(total_budget - remaining_budget, 2)
     }

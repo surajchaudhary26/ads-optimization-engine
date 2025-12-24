@@ -19,3 +19,20 @@ class HealthResponse(BaseModel):
     status: str = Field(example="ok")
     service: str = Field(example="ads-optimization-engine")
     message: str = Field(example="Service is healthy and running")
+
+
+class SelectedAd(BaseModel):
+    ad_id: str = Field(example="ad_101")
+    cost: float = Field(example=50)
+    priority: int = Field(example=2)
+    ml_score: float = Field(example=12.5)
+    final_score: float = Field(example=8.3)
+
+
+class AdsDecisionResponse(BaseModel):
+    success: bool = Field(example=True)
+    strategy: str = Field(example="hybrid_ml")
+    selected_ads: List[SelectedAd]
+    total_cost: float = Field(example=230)
+    remaining_budget: float = Field(example=70)
+    timestamp: str = Field(example="2025-12-24T10:30:00")
