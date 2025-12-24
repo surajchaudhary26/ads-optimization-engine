@@ -6,7 +6,6 @@ from app.features.feature_extractor import extract_features
 from app.inference.model_loader import load_model
 
 
-# Single source of truth for feature order
 FEATURE_COLUMNS = [
     "cost",
     "priority",
@@ -17,10 +16,6 @@ FEATURE_COLUMNS = [
 
 
 def hybrid_score(ad: AdInput, ml_score: float) -> float:
-    """
-    Combines ML prediction with business heuristics
-    to produce a final ranking score.
-    """
     return (
         0.3 * (ml_score / 100.0)
         + 0.5 * ad.priority
@@ -33,25 +28,36 @@ def optimize_ads_v2(
     total_budget: float
 ) -> Dict:
     """
-    Hybrid ML optimizer:
-    - Uses ML model for value prediction
-    - Applies business rules for final ranking
-    - Selects ads under budget constraints
+    Production-safe Hybrid ML optimizer
     """
 
-    model = load_model()
+    # 🔹 SAFE model loading
+    try:
+        model = load_model()
+    except Exception as e:
+        print("❌ MODEL LOAD FAILED:", e)
+        model = None   # fallback mode
+
     ranked_ads = []
 
     for ad in ads:
         features = extract_features(ad)
 
-        # DataFrame with feature names (avoids sklearn warnings)
         X = pd.DataFrame(
             [[features[col] for col in FEATURE_COLUMNS]],
             columns=FEATURE_COLUMNS
         )
 
-        ml_score = float(model.predict(X)[0])
+        # 🔹 SAFE prediction
+        try:
+            if model is not None:
+                ml_score = float(model.predict(X)[0])
+            else:
+                ml_score = 0.0
+        except Exception as e:
+            print("⚠️ ML PREDICTION FAILED:", e)
+            ml_score = 0.0
+
         final_score = hybrid_score(ad, ml_score)
 
         ranked_ads.append({
@@ -62,10 +68,10 @@ def optimize_ads_v2(
             "final_score": round(final_score, 2)
         })
 
-    # Rank ads by hybrid score
+    # 🔹 Rank by final score
     ranked_ads.sort(key=lambda x: x["final_score"], reverse=True)
 
-    # Budget-aware selection
+    # 🔹 Budget selection
     selected_ads = []
     remaining_budget = total_budget
 
@@ -77,5 +83,6 @@ def optimize_ads_v2(
     return {
         "strategy": "hybrid_ml",
         "selected_ads": selected_ads,
-        "total_cost": round(total_budget - remaining_budget, 2)
+        "total_cost": round(total_budget - remaining_budget, 2),
+        "remaining_budget": round(remaining_budget, 2)
     }
