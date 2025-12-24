@@ -1,7 +1,25 @@
+# -------------------------
+# Backend (FastAPI)
+# -------------------------
 fastapi
 uvicorn
 
-pandas
+# -------------------------
+# Data & ML
+# -------------------------
 numpy
+pandas
 scikit-learn
 joblib
+
+# -------------------------
+# UI (Streamlit)
+# -------------------------
+streamlit
+requests
+
+# -------------------------
+# Validation / Settings
+# -------------------------
+pydantic
+pydantic-settings

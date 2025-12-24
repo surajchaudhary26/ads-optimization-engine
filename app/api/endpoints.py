@@ -1,26 +1,22 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
+from app.api.schemas import AdsRequest, AdsDecisionResponse
 from app.service.decision_service import decide_ads
-from app.api.schemas import AdsRequest
 
 router = APIRouter()
 
 
-@router.post("/decide-ads")
+@router.post(
+    "/decide-ads",
+    response_model=AdsDecisionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Decide optimal ads under a given budget"
+)
 def decide_ads_endpoint(request: AdsRequest):
-    """
-    API endpoint to decide which ads to select under a given budget.
-    """
+    result = decide_ads(request.ads, request.total_budget)
 
-    # Correct way to access Pydantic fields
-    ads = request.ads
-    total_budget = request.total_budget
-
-    result = decide_ads(ads, total_budget)
-
-    # If validation fails
     if not result["success"]:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=result["error"]
         )
 

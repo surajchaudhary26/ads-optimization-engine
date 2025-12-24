@@ -1,12 +1,11 @@
-def select_ads_rule_based(ads, total_budget):
-    """
-    Rule-based ad selection logic.
+from typing import List, Dict
+from app.api.schemas import AdInput
 
-    Strategy:
-    1. Sort ads by priority (high to low)
-    2. Within same priority, sort by cost (low to high)
-    3. Select ads greedily until budget is exhausted
-    """
+
+def select_ads_rule_based(
+    ads: List[AdInput],
+    total_budget: float
+) -> Dict:
 
     selected_ads = []
     remaining_budget = total_budget
@@ -25,6 +24,9 @@ def select_ads_rule_based(ads, total_budget):
             })
             remaining_budget -= ad.cost
 
-    total_cost_used = total_budget - remaining_budget
-
-    return selected_ads, total_cost_used
+    return {
+        "strategy": "rule_based",
+        "selected_ads": selected_ads,
+        "total_cost": total_budget - remaining_budget,
+        "remaining_budget": remaining_budget
+    }

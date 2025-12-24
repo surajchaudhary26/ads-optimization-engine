@@ -242,7 +242,6 @@ Pull and run the container:
 docker pull ersurajkr/ads-optimization-engine:latest
 docker run -p 8000:8000 ersurajkr/ads-optimization-engine:latest
 
-
 ## Live Demo (Cloud Deployment)
 
 The application is deployed on **Render** and publicly accessible.

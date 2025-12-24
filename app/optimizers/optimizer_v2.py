@@ -1,60 +1,86 @@
-import numpy as np
+import pandas as pd
+from typing import List, Dict
+
+from app.api.schemas import AdInput
 from app.features.feature_extractor import extract_features
-from app.inference.model_loader import model
+from app.inference.model_loader import load_model
 
-def hybrid_score(ad, ml_score):
+
+# Single source of truth for feature order
+FEATURE_COLUMNS = [
+    "cost",
+    "priority",
+    "clicks",
+    "conversions",
+    "conversion_rate"
+]
+
+
+def hybrid_score(ad: AdInput, ml_score: float) -> float:
     """
-    Combine business rules + ML score
-    HYBRID decision logic
+    Combines ML prediction with business heuristics
+    to produce a final ranking score.
     """
-
-    ml_score_norm = ml_score / 100  
-
-    priority_weight = ad.priority * 0.5
-    cost_penalty = ad.cost * 0.1
-
-    final_score = (
-        0.3 * ml_score_norm
-        + priority_weight
-        - cost_penalty
+    return (
+        0.3 * (ml_score / 100.0)
+        + 0.5 * ad.priority
+        - 0.1 * ad.cost
     )
 
-    return final_score
 
-
-def optimize_ads_v2(ads):
+def optimize_ads_v2(
+    ads: List[AdInput],
+    total_budget: float
+) -> Dict:
     """
-    Hybrid optimizer:
-    - assumes data is already validated
-    - uses ML score + business logic
+    Hybrid ML optimizer:
+    - Uses ML model for value prediction
+    - Applies business rules for final ranking
+    - Selects ads under budget constraints
     """
 
-    optimized_ads = []
+    model = load_model()
+    ranked_ads = []
 
     for ad in ads:
+        # Extract engineered features
         features = extract_features(ad)
 
-        X = np.array([[
-            features["cost"],
-            features["priority"],
-            features["clicks"],
-            features["conversions"],
-            features["conversion_rate"]
-        ]])
+        # Create DataFrame with FEATURE NAMES (FIXES WARNING)
+        X = pd.DataFrame(
+            [[features[col] for col in FEATURE_COLUMNS]],
+            columns=FEATURE_COLUMNS
+        )
 
-        ml_score = model.predict(X)[0]
+        # ML prediction
+        ml_score = float(model.predict(X)[0])
+
+        # Hybrid scoring
         final_score = hybrid_score(ad, ml_score)
 
-        optimized_ads.append({
+        ranked_ads.append({
             "ad_id": ad.ad_id,
             "cost": ad.cost,
-            "ml_score": round(float(ml_score), 2),
-            "final_score": round(float(final_score), 2)
+            "priority": ad.priority,
+            "ml_score": round(ml_score, 2),
+            "final_score": round(final_score, 2)
         })
 
-    optimized_ads.sort(
-        key=lambda x: x["final_score"],
-        reverse=True
-    )
+    # Rank ads by hybrid score
+    ranked_ads.sort(key=lambda x: x["final_score"], reverse=True)
 
-    return optimized_ads
+    # Budget-aware selection
+    selected_ads = []
+    remaining_budget = total_budget
+
+    for ad in ranked_ads:
+        if ad["cost"] <= remaining_budget:
+            selected_ads.append(ad)
+            remaining_budget -= ad["cost"]
+
+    return {
+        "strategy": "hybrid_ml",
+        "selected_ads": selected_ads,
+        "total_cost": round(total_budget - remaining_budget, 2),
+        "remaining_budget": round(remaining_budget, 2)
+    }
