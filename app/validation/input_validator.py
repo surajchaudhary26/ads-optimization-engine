@@ -1,7 +1,6 @@
 from typing import List, Tuple
 from app.api.schemas import AdInput
 
-
 def validate_input(
     ads: List[AdInput],
     total_budget: float
