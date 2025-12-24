@@ -1,6 +1,6 @@
 import requests
 from typing import Dict, Any
-from ui.config import DECIDE_ENDPOINT
+from config import DECIDE_ENDPOINT
 
 def decide_ads(payload: Dict[str, Any]) -> Dict[str, Any]:
     response = requests.post(

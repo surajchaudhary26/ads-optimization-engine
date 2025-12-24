@@ -1,7 +1,7 @@
 import streamlit as st
-from ui.config import APP_TITLE, APP_SUBTITLE
-from ui.layout import render_header, render_input_section, render_results
-from ui.api import decide_ads
+from config import APP_TITLE, APP_SUBTITLE
+from layout import render_header, render_input_section, render_results
+from api import decide_ads
 
 st.set_page_config(layout="wide")
 
