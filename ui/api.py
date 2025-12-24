@@ -1,12 +1,12 @@
 import requests
-from ui.config import BACKEND_DECIDE_ADS_URL
+from typing import Dict, Any
+from ui.config import DECIDE_ENDPOINT
 
-
-def call_decide_ads(payload: dict) -> dict:
+def decide_ads(payload: Dict[str, Any]) -> Dict[str, Any]:
     response = requests.post(
-        BACKEND_DECIDE_ADS_URL,
+        DECIDE_ENDPOINT,
         json=payload,
-        timeout=15
+        timeout=30
     )
     response.raise_for_status()
     return response.json()
