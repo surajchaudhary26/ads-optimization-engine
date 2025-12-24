@@ -1,6 +1,5 @@
 import streamlit as st
 
-
 def render_header(title: str, subtitle: str):
     st.title(title)
     st.caption(subtitle)
@@ -17,12 +16,13 @@ def render_input_section():
     )
 
     ads = []
+
     for i in range(1, 5):
         with st.expander(f"Ad {i}"):
-            ads.append({
+            ad = {
                 "ad_id": st.text_input(
                     "Ad ID",
-                    f"ad_{i}",
+                    value=f"ad_{i}",
                     key=f"ad_id_{i}"
                 ),
                 "cost": st.number_input(
@@ -49,7 +49,9 @@ def render_input_section():
                     value=10,
                     key=f"conversions_{i}"
                 ),
-            })
+            }
+
+            ads.append(ad)
 
     return {
         "total_budget": budget,
@@ -65,7 +67,7 @@ def render_results(response):
 
     for ad in response["selected_ads"]:
         with st.expander(f"Rank {ad['rank']} — {ad['label']}"):
-            st.write(f"Ad ID: {ad['ad_id']}")
-            st.write(f"Final Score: {ad['final_score']}")
-            st.write(f"ML Score: {ad['ml_score']}")
-            st.write(f"Reason: {ad['reason']}")
+            st.write(f"**Ad ID:** {ad['ad_id']}")
+            st.write(f"**Final Score:** {ad['final_score']}")
+            st.write(f"**ML Score:** {ad['ml_score']}")
+            st.write(f"**Reason:** {ad['reason']}")
