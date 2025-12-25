@@ -1,180 +1,204 @@
 import streamlit as st
 import requests
+from typing import List, Dict
 
-# ================= CONFIG =================
-BACKEND_URL = "http://127.0.0.1:8000/decide-ads"
-# Render backend ke liye:
-# BACKEND_URL = "https://ads-optimization-engine.onrender.com/decide-ads"
+# =========================================================
+# CONFIGURATION
+# =========================================================
+
+BACKEND_URL = "https://ads-optimization-engine.onrender.com/decide-ads"
 
 st.set_page_config(
     page_title="Ads Optimization Engine",
     layout="wide"
 )
 
-# ================= HEADER =================
+# =========================================================
+# PROJECT INTRODUCTION
+# =========================================================
+
 st.title("Ads Optimization Engine")
-st.caption("Explainable ML-driven Ad Selection System")
 
 st.markdown(
     """
-This tool helps you **select the most effective advertisements** within a fixed budget.
+### What is this project?
 
-### What you do:
-- Enter campaign budget  
-- Provide ad details  
+This system helps you **select the best advertisements under a fixed budget**.
 
-### What the system does:
-- Uses ML + business rules  
-- Ranks ads  
-- Explains *why* an ad is recommended  
+Instead of manually choosing ads, the engine:
+- Evaluates **cost, business priority, clicks, and conversions**
+- Applies **machine-learning signals + business rules**
+- Ranks ads and explains **why** each ad is selected
+
+The goal is simple:
+> **Spend less, prioritize better ads, and make decisions transparently.**
 """
 )
 
 st.divider()
 
-# ================= INPUT SECTION =================
-st.subheader("1️⃣ Campaign Configuration")
+# =========================================================
+# CAMPAIGN CONFIGURATION
+# =========================================================
+
+st.subheader("Campaign Setup")
 
 total_budget = st.number_input(
-    "Total Campaign Budget",
-    min_value=1.0,
-    value=500.0,
-    help="Maximum total amount you want to spend on ads"
+    label="Total Campaign Budget",
+    min_value=1,
+    value=500,
+    step=50,
+    help="Maximum total amount you want to spend across all ads"
 )
 
 ad_count = st.number_input(
-    "Number of Ads",
+    label="Number of Ads to Evaluate",
     min_value=1,
+    max_value=10,
     value=1,
-    step=1,
-    help="How many ads you want to evaluate"
+    step=1
 )
 
 st.divider()
 
-# ================= AD DETAILS =================
-st.subheader("2️⃣ Ad Details")
-st.caption(
-    "Provide information for each ad. These details help the ML engine "
-    "estimate performance, importance, and cost efficiency."
+# =========================================================
+# AD INPUT SECTION
+# =========================================================
+
+st.subheader("Ad Details")
+
+st.markdown(
+    """
+Provide realistic values for each advertisement.
+These inputs directly influence ranking and selection.
+"""
 )
 
-ads = []
+ads: List[Dict] = []
 
 for i in range(ad_count):
     with st.expander(f"Ad {i + 1}", expanded=True):
 
-        st.markdown("**🆔 Ad Identifier**")
-        st.caption("A unique name or ID to identify this advertisement.")
         ad_id = st.text_input(
-            "Ad ID",
-            value=f"ad_{i+1}",
+            label="Ad Identifier",
+            value=f"ad_{i + 1}",
+            help="A unique ID or name for this ad",
             key=f"ad_id_{i}"
         )
 
-        st.markdown("**💰 Ad Cost**")
-        st.caption("How much budget is required to run this ad.")
         cost = st.number_input(
-            "Cost",
-            min_value=1.0,
-            value=50.0,
+            label="Cost",
+            min_value=1,
+            value=50,
+            step=5,
+            help="Budget required to run this ad",
             key=f"cost_{i}"
         )
 
-        st.markdown("**⭐ Business Priority**")
-        st.caption(
-            "How important this ad is for the business:\n\n"
-            "- **3** → High priority\n"
-            "- **2** → Medium priority\n"
-            "- **1** → Low priority"
-        )
         priority = st.selectbox(
-            "Priority",
-            [1, 2, 3],
+            label="Business Priority",
+            options=[1, 2, 3],
             index=2,
+            help="3 = High priority, 2 = Medium, 1 = Low",
             key=f"priority_{i}"
         )
 
-        st.markdown("**👆 Clicks**")
-        st.caption(
-            "Estimated or historical number of clicks this ad receives.\n"
-            "Higher clicks usually mean more user interest."
-        )
         clicks = st.number_input(
-            "Clicks",
+            label="Estimated Clicks",
             min_value=0,
             value=100,
+            step=10,
+            help="Expected or historical clicks",
             key=f"clicks_{i}"
         )
 
-        st.markdown("**🎯 Conversions**")
-        st.caption(
-            "Number of successful outcomes from clicks "
-            "(e.g., purchases, sign-ups)."
-        )
         conversions = st.number_input(
-            "Conversions",
+            label="Conversions",
             min_value=0,
             value=10,
+            step=1,
+            help="Successful outcomes from clicks",
             key=f"conversions_{i}"
         )
 
-        ads.append({
-            "ad_id": ad_id,
-            "cost": cost,
-            "priority": priority,
-            "clicks": clicks,
-            "conversions": conversions
-        })
+        ads.append(
+            {
+                "ad_id": ad_id,
+                "cost": int(cost),
+                "priority": int(priority),
+                "clicks": int(clicks),
+                "conversions": int(conversions),
+            }
+        )
 
 st.divider()
 
-# ================= SUBMIT =================
-if st.button("🚀 Optimize Ads"):
+# =========================================================
+# SUBMIT & BACKEND CALL
+# =========================================================
+
+if st.button("Run Optimization", type="primary"):
+
     payload = {
-        "total_budget": total_budget,
+        "total_budget": int(total_budget),
         "ads": ads
     }
 
+    st.subheader("Request Payload")
+    st.json(payload)
+
     try:
-        with st.spinner("Running optimization engine..."):
+        with st.spinner("Evaluating ads and optimizing budget..."):
             response = requests.post(
                 BACKEND_URL,
                 json=payload,
+                headers={"Content-Type": "application/json"},
                 timeout=30
             )
-            response.raise_for_status()
-            result = response.json()
 
-    except Exception as e:
-        st.error("Unable to reach backend service.")
+        if response.status_code != 200:
+            st.error("Backend returned an error")
+            st.code(response.text)
+            st.stop()
+
+        result = response.json()
+
+    except requests.exceptions.RequestException as e:
+        st.error("Failed to connect to backend service")
+        st.exception(e)
         st.stop()
 
-    if not result.get("success"):
-        st.error(result.get("error", "Something went wrong"))
+    if not result.get("success", False):
+        st.error("Optimization failed")
+        st.json(result)
         st.stop()
 
-    # ================= OUTPUT =================
-    st.success("Optimization Completed Successfully")
+    # =========================================================
+    # RESULTS
+    # =========================================================
 
-    st.subheader("3️⃣ Summary")
+    st.success("Optimization completed successfully")
+
+    st.subheader("Summary")
+
     col1, col2 = st.columns(2)
     col1.metric("Total Cost Used", result["total_cost"])
     col2.metric("Remaining Budget", result["remaining_budget"])
 
     st.divider()
 
-    st.subheader("4️⃣ Recommended Ads (Ranked)")
+    st.subheader("Recommended Ads (Ranked)")
 
     for ad in result["selected_ads"]:
-        with st.expander(f"Rank {ad['rank']} — {ad['label']}"):
-            st.write(f"**Ad ID:** {ad['ad_id']}")
-            st.write(f"**Cost:** {ad['cost']}")
-            st.write(f"**Priority:** {ad['priority']}")
-            st.write(f"**ML Score:** {ad['ml_score']}")
-            st.write(f"**Final Score:** {ad['final_score']}")
+        with st.expander(f"Rank {ad['rank']} — {ad['label']}", expanded=True):
+            st.write(f"Ad ID: {ad['ad_id']}")
+            st.write(f"Cost: {ad['cost']}")
+            st.write(f"Priority: {ad['priority']}")
+            st.write(f"ML Score: {ad['ml_score']}")
+            st.write(f"Final Score: {ad['final_score']}")
             st.info(ad["reason"])
 
     st.divider()
+
     st.subheader("Raw Backend Response")
     st.json(result)
