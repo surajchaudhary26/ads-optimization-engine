@@ -299,8 +299,15 @@ Live Demo (Cloud Deployment)
 
 The application is deployed on Render using the same Docker image.
 
+Live Health Check:
+https://ads-optimization-engine.onrender.com
+
 Live Swagger UI:
-https://ads-optimization-engine-latest.onrender.com
+https://ads-optimization-engine.onrender.com/docs
+
+Live Strimlit UI:
+https://ads-optimization-ui-streamlit.onrender.com
+
 
 This demonstrates a production-ready, stateless ML inference API running in the cloud.
 
